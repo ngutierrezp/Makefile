@@ -36,7 +36,7 @@ ifeq ($(OS),Windows_NT)
 	CODE_DIR := $(CODE_DIR)\\
 	INCL_DIR := $(INCL_DIR)\\
 	FIN_DIR := $(FIN_DIR)\\
-	CLEAN_COMMAND := del
+	CLEAN_COMMAND := rm 
 	ifeq ($(PROCESSOR_ARCHITECTURE),AMD64)
 		# x64
 		ARQUITECTURA = -D AMD64
@@ -87,7 +87,6 @@ endif
 #
 
 all: $(EXECUTABLE_NAME)
-	@echo $(SISTEMA) $(ARQUITECTURA) $(CODE_DIR) $(INCL_DIR) $(FIN_DIR)
 	@echo "Compilacion terminada!!!!"
 	@echo "Archivo generado : $(EXECUTABLE_NAME)"
 
@@ -109,7 +108,18 @@ $(FIN_DIR)debug_d.o: $(CODE_DIR)debug.c $(INCL_DIR)debug.h $(INCL_DIR)boards.h $
 	$(COMPILE_COMMAND) -c $(SISTEMA) $(OPTION_COMPILE) $(CODE_DIR)debug.c -o $(FIN_DIR)debug_d.o
 
 clean: 
-	@echo "comando eliminar : $(CLEAN_COMMAND) $(FIN_DIR)*.o"
-	$(CLEAN_COMMAND) $(FIN_DIR)*.o
-	$(CLEAN_COMMAND) *.out *.exe
+	@echo "Eliminado $(CLEAN_COMMAND) *.out *.exe"
+	@echo >> rm.out
+	$(CLEAN_COMMAND) *.out
+	@echo >> rm.exe
+	$(CLEAN_COMMAND) *.exe
+	@echo "Completado"
+	@echo "Cambiando carpeta a $(FIN_DIR)"
+	cd $(FIN_DIR)
+	@echo "Eliminado $(CLEAN_COMMAND) *.o"
+	@echo >> rm.o
+	$(CLEAN_COMMAND) *.o
+	@echo "Completado"
+	@echo "Cambiando a carpeta original"
+	cd ..
 	@echo "Limpieza de archivos residuales completa!."
