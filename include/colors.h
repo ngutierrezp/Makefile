@@ -18,9 +18,31 @@
 #include <stdio.h>
 #define COLORS_H
 
+#ifdef WINDOWS
+
+#define RESET_COLOR		""
+#define NEGRO_T        	""
+#define NEGRO_F        	""
+#define ROJO_T     		""
+#define ROJO_F     		""
+#define VERDE_T        	""
+#define VERDE_F        	""
+#define AMARILLO_T 		""
+#define AMARILLO_F  	""
+#define AZUL_T     		""
+#define AZUL_F      	""
+#define MAGENTA_T  		""
+#define MAGENTA_F  		""
+#define CYAN_T     		""
+#define CYAN_F     		""
+#define BLANCO_T   		""
+#define BLANCO_F   		""
+
+
+#endif
 #define RESET_COLOR		"\x1b[0m"
 #define NEGRO_T        	"\x1b[30m"
-#define NEGRO_F        	"\x1b[40m"
+#define NEGRO_F        	//"\x1b[40m"
 #define ROJO_T     		"\x1b[31m"
 #define ROJO_F     		"\x1b[41m"
 #define VERDE_T        	"\x1b[32m"
@@ -35,6 +57,8 @@
 #define CYAN_F     		"\x1b[46m"
 #define BLANCO_T   		"\x1b[37m"
 #define BLANCO_F   		"\x1b[47m"
+
+
 
 // funcion para la prueba de los colores 
 
