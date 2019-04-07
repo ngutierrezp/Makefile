@@ -98,20 +98,18 @@ $(FIN_DIR)debug.o: $(CODE_DIR)debug.c $(INCL_DIR)debug.h $(INCL_DIR)boards.h $(I
 	
 	$(COMPILE_COMMAND) -c $(SISTEMA) $(CODE_DIR)debug.c -o $(FIN_DIR)debug.o
 
-debug: 
-	$(EXECUTABLE_NAME_DEBUG)
+debug: $(EXECUTABLE_NAME_DEBUG)
+	@echo "Programa compilado bajo la instruccion de debug"
+	@echo "Archivo generado: $(EXECUTABLE_NAME_DEBUG)"
 
 $(EXECUTABLE_NAME_DEBUG): clean $(FIN_DIR)debug_d.o 
 	$(COMPILE_COMMAND) $(SISTEMA) $(OPTION_COMPILE) $(FIN_DIR)debug_d.o $(CODE_DIR)main.c -o $(EXECUTABLE_NAME_DEBUG) 
 
 $(FIN_DIR)debug_d.o: $(CODE_DIR)debug.c $(INCL_DIR)debug.h $(INCL_DIR)boards.h $(INCL_DIR)colors.h
-	$(CLEAN_COMMAND) -c $(SISTEMA) $(OPTION_COMPILE) $(CODE_DIR)debug.c -o $(FIN_DIR)debug_d.o
+	$(COMPILE_COMMAND) -c $(SISTEMA) $(OPTION_COMPILE) $(CODE_DIR)debug.c -o $(FIN_DIR)debug_d.o
 
 clean: 
 	@echo "comando eliminar : $(CLEAN_COMMAND) $(FIN_DIR)*.o"
-	@echo "."
-	@echo "Si el comando del no funciona verifique que este agregado en el PATH"
-	@echo "."
 	$(CLEAN_COMMAND) $(FIN_DIR)*.o
 	$(CLEAN_COMMAND) *.out *.exe
 	@echo "Limpieza de archivos residuales completa!."
