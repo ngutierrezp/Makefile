@@ -5,8 +5,7 @@
 
 int main(int argc, char const *argv[])
 {
-    //PRUEBA DE COLOR
-    COLOR_TEST;
+    
 
     matrix new;
     new.high=10;
@@ -25,6 +24,11 @@ int main(int argc, char const *argv[])
     new.board[0]='X';
     
 
+    #ifdef DEBUG
     print_current(new,5000,5,80,20,9);
+    COLOR_TEST;
+    #endif
+
+    printf("programa terminado..\n");
     return 0;
 }
