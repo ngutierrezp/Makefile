@@ -85,6 +85,7 @@ endif
 #
 #
 #
+.SILENT: clean $(EXECUTABLE_NAME) $(EXECUTABLE_NAME_DEBUG) $(FIN_DIR)debug.o $(FIN_DIR)debug_d.o
 
 all: $(EXECUTABLE_NAME)
 	@echo "Compilacion terminada!!!!"

@@ -12,12 +12,12 @@ int main(int argc, char const *argv[])
     new.high=10;
     new.width=20;
     new.board = (char*)malloc(sizeof(char)*(new.high*new.width));
-    printf("Hasta aca bien \n");
+    
 
     int i;
     for(i = 0; i < (new.high*new.width) ; i++)
     {
-        printf("Iteracion : %i\n",i);
+        
         new.board[i] = '_';
         
     }
