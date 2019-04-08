@@ -13,7 +13,23 @@ CLEAN_COMMAND = none
 COMPILE_COMMAND = gcc
 EXECUTABLE_NAME = lab
 OPTION_COMPILE = -D DEBUG
+ADD_EXTEN = none
 EXECUTABLE_NAME_DEBUG := $(EXECUTABLE_NAME)_debug
+## Solo colores
+NO_COLOR=\x1b[0m
+
+OK_COLOR=\x1b[32;01m
+
+ERROR_COLOR=\x1b[31;01m
+
+WARN_COLOR=\x1b[33;01m
+
+SUSF_PRINT = \e[1;34m
+
+PUR_COLOR = \033[0;35m
+
+
+
 
 
 
@@ -36,6 +52,7 @@ ifeq ($(OS),Windows_NT)
 	CODE_DIR := $(CODE_DIR)\\
 	INCL_DIR := $(INCL_DIR)\\
 	FIN_DIR := $(FIN_DIR)\\
+	ADD_EXTEN := /
 	CLEAN_COMMAND := rm 
 	ifeq ($(PROCESSOR_ARCHITECTURE),AMD64)
 		# x64
@@ -53,6 +70,7 @@ else
 	CODE_DIR := $(CODE_DIR)/
 	INCL_DIR := $(INCL_DIR)/
 	FIN_DIR := $(FIN_DIR)/
+	ADD_EXTEN := 
 	CLEAN_COMMAND := rm -f
 	UNAME_S := $(shell uname -s)
 	### LINUX ###
@@ -88,8 +106,8 @@ endif
 .SILENT: clean $(EXECUTABLE_NAME) $(EXECUTABLE_NAME_DEBUG) $(FIN_DIR)debug.o $(FIN_DIR)debug_d.o
 
 all: $(EXECUTABLE_NAME)
-	@echo "Compilacion terminada!!!!"
-	@echo "Archivo generado : $(EXECUTABLE_NAME)"
+	@echo -e "Compilacion $(PUR_COLOR)terminada!!!!$(NO_COLOR)"
+	@echo -e "Archivo generado : $(OK_COLOR)$(EXECUTABLE_NAME)$(NO_COLOR)"
 
 $(EXECUTABLE_NAME): clean $(FIN_DIR)debug.o
 	$(COMPILE_COMMAND) $(SISTEMA)  $(FIN_DIR)debug.o $(CODE_DIR)main.c -o $(EXECUTABLE_NAME)
@@ -99,8 +117,8 @@ $(FIN_DIR)debug.o: $(CODE_DIR)debug.c $(INCL_DIR)debug.h $(INCL_DIR)boards.h $(I
 	$(COMPILE_COMMAND) -c $(SISTEMA) $(CODE_DIR)debug.c -o $(FIN_DIR)debug.o
 
 debug: $(EXECUTABLE_NAME_DEBUG)
-	@echo "Programa compilado bajo la instruccion de debug"
-	@echo "Archivo generado: $(EXECUTABLE_NAME_DEBUG)"
+	@echo -e "Programa compilado en modo $(ERROR_COLOR)DEBUG$(NO_COLOR)"
+	@echo -e "Archivo generado: $(OK_COLOR)$(EXECUTABLE_NAME_DEBUG)$(NO_COLOR)"
 
 $(EXECUTABLE_NAME_DEBUG): clean $(FIN_DIR)debug_d.o 
 	$(COMPILE_COMMAND) $(SISTEMA) $(OPTION_COMPILE) $(FIN_DIR)debug_d.o $(CODE_DIR)main.c -o $(EXECUTABLE_NAME_DEBUG) 
@@ -109,18 +127,16 @@ $(FIN_DIR)debug_d.o: $(CODE_DIR)debug.c $(INCL_DIR)debug.h $(INCL_DIR)boards.h $
 	$(COMPILE_COMMAND) -c $(SISTEMA) $(OPTION_COMPILE) $(CODE_DIR)debug.c -o $(FIN_DIR)debug_d.o
 
 clean: 
-	@echo "Eliminado $(CLEAN_COMMAND) *.out *.exe"
+	@echo -e "\n"
+	@echo -e "Eliminado *.out *.exe ...."
 	@echo >> rm.out
 	$(CLEAN_COMMAND) *.out
 	@echo >> rm.exe
 	$(CLEAN_COMMAND) *.exe
-	@echo "Completado"
-	@echo "Cambiando carpeta a $(FIN_DIR)"
-	cd $(FIN_DIR)
-	@echo "Eliminado $(CLEAN_COMMAND) *.o"
-	@echo >> rm.o
-	$(CLEAN_COMMAND) *.o
-	@echo "Completado"
-	@echo "Cambiando a carpeta original"
+	@echo -e "$(OK_COLOR)[OK]$(NO_COLOR)"
+	@echo -e "Eliminado *.o ...."
+	@echo >> $(FIN_DIR)$(ADD_EXTEN)rm.o
+	$(CLEAN_COMMAND) $(FIN_DIR)$(ADD_EXTEN)*.o
+	@echo -e "$(OK_COLOR)[OK]$(NO_COLOR)"
 	cd ..
-	@echo "Limpieza de archivos residuales completa!."
+	@echo -e "Limpieza de archivos residuales $(WARN_COLOR)completa!!$(NO_COLOR).\n\n"
