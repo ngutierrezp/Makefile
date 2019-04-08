@@ -72,6 +72,19 @@ else
 	FIN_DIR := $(FIN_DIR)/
 	ADD_EXTEN := 
 	CLEAN_COMMAND := rm -f
+
+	NO_COLOR :=\033[0;0m
+
+	OK_COLOR :=\033[0;32m
+
+	ERROR_COLOR :=\033[0;31m
+
+	WARN_COLOR :=\033[0;36m
+
+	SUSF_PRINT :=\033[0;34m
+
+	PUR_COLOR := \033[0;35m
+
 	UNAME_S := $(shell uname -s)
 	### LINUX ###
 	ifeq ($(UNAME_S),Linux)
