@@ -6,8 +6,8 @@
 
 ARQUITECTURA = none
 SISTEMA = none 
-CODE_DIR= src
-FIN_DIR = bin
+SRC= src
+OBJ = obj
 INCL_DIR= include
 CLEAN_COMMAND = none
 COMPILE_COMMAND = gcc
@@ -49,9 +49,9 @@ ifeq ($(OS),Windows_NT)
 
 	EXECUTABLE_NAME := $(EXECUTABLE_NAME).exe
 	EXECUTABLE_NAME_DEBUG := $(EXECUTABLE_NAME_DEBUG).exe
-	CODE_DIR := $(CODE_DIR)\\
+	SRC := $(SRC)\\
 	INCL_DIR := $(INCL_DIR)\\
-	FIN_DIR := $(FIN_DIR)\\
+	OBJ := $(OBJ)\\
 	ADD_EXTEN := 
 	CLEAN_COMMAND := del
 	ifeq ($(PROCESSOR_ARCHITECTURE),AMD64)
@@ -67,9 +67,9 @@ else
 
 	EXECUTABLE_NAME := $(EXECUTABLE_NAME).out
 	EXECUTABLE_NAME_DEBUG := $(EXECUTABLE_NAME_DEBUG).out
-	CODE_DIR := $(CODE_DIR)/
+	SRC := $(SRC)/
 	INCL_DIR := $(INCL_DIR)/
-	FIN_DIR := $(FIN_DIR)/
+	OBJ := $(OBJ)/
 	ADD_EXTEN := 
 	CLEAN_COMMAND := rm -f
 
@@ -116,40 +116,71 @@ endif
 #
 #
 #
-.SILENT: clean $(EXECUTABLE_NAME) $(EXECUTABLE_NAME_DEBUG) $(FIN_DIR)debug.o $(FIN_DIR)debug_d.o
+#-------------------------------------------------------------------------
+########################
+# Sentencia de Recetas #
+########################
 
-all: $(EXECUTABLE_NAME)
-	@echo -e "Compilacion $(PUR_COLOR)terminada!!!!$(NO_COLOR)"
-	@echo -e "Archivo generado : $(OK_COLOR)$(EXECUTABLE_NAME)$(NO_COLOR)"
+SOURCES := $(wildcard $(SRC)*.c)
+OBJECTS := $(patsubst $(SRC)%.c, $(OBJ)%.o, $(SOURCES))
 
-$(EXECUTABLE_NAME): clean $(FIN_DIR)debug.o
-	$(COMPILE_COMMAND) $(SISTEMA)  $(FIN_DIR)debug.o $(CODE_DIR)main.c -o $(EXECUTABLE_NAME)
+all: clean main
+	@echo "$(PUR_COLOR)Ejecutable generado!$(NO_COLOR) Nombre: $(OK_COLOR)$(EXECUTABLE_NAME)$(NO_COLOR) "
 
-$(FIN_DIR)debug.o: $(CODE_DIR)debug.c $(INCL_DIR)debug.h $(INCL_DIR)boards.h $(INCL_DIR)colors.h
+
+main: $(OBJECTS)
+	@echo "Generando ejecutable ..."
+	($(CC) $^ -lm $(DEBUG_MODE) $(SISTEMA) -o $(EXECUTABLE_NAME) && echo "$(OK_COLOR)[OK]$(NO_COLOR)") \
+		||  (echo "$(ERROR_COLOR)[ERROR]$(NO_COLOR)" && exit 1; )
+	@echo "\n"
 	
-	$(COMPILE_COMMAND) -c $(SISTEMA) $(CODE_DIR)debug.c -o $(FIN_DIR)debug.o
 
-debug: $(EXECUTABLE_NAME_DEBUG)
-	@echo -e "Programa compilado en modo $(ERROR_COLOR)DEBUG$(NO_COLOR)"
-	@echo -e "Archivo generado: $(OK_COLOR)$(EXECUTABLE_NAME_DEBUG)$(NO_COLOR)"
+debug: set-debug
 
-$(EXECUTABLE_NAME_DEBUG): clean $(FIN_DIR)debug_d.o 
-	$(COMPILE_COMMAND) $(SISTEMA) $(OPTION_COMPILE) $(FIN_DIR)debug_d.o $(CODE_DIR)main.c -o $(EXECUTABLE_NAME_DEBUG) 
+set-debug: DEBUG_MODE := -DDEBUG
+set-debug: all-debug
 
-$(FIN_DIR)debug_d.o: $(CODE_DIR)debug.c $(INCL_DIR)debug.h $(INCL_DIR)boards.h $(INCL_DIR)colors.h
-	$(COMPILE_COMMAND) -c $(SISTEMA) $(OPTION_COMPILE) $(CODE_DIR)debug.c -o $(FIN_DIR)debug_d.o
+all-debug: clean main-debug
+	@echo "$(ERROR_COLOR)[DEBUG MODE] $(PUR_COLOR)Ejecutable generado!$(NO_COLOR) Nombre: $(OK_COLOR)$(EXECUTABLE_NAME_DEBUG)$(NO_COLOR) "
+
+
+main-debug: $(OBJECTS)
+	@echo "Generando ejecutable ..."
+	($(CC) $^ -lm $(DEBUG_MODE) $(SISTEMA) -o $(EXE_NAME_DEBUG) && echo "$(OK_COLOR)[OK]$(NO_COLOR)") \
+		||  (echo "$(ERROR_COLOR)[ERROR]$(NO_COLOR)" && exit 1; )
+	@echo "\n"
+
+$(OBJ)%.o: $(SRC)%.c
+	@echo "Generando archivos object de $@ ...."
+	($(CC) $(DEBUG_MODE) $(SISTEMA) -lm -I$(SRC) -c $< -o $@ && echo "$(OK_COLOR)[OK]$(NO_COLOR)") \
+		||  (echo "$(ERROR_COLOR)[ERROR]$(NO_COLOR)" && exit 1; )
 
 clean: 
-	@echo -e "\n"
-	@echo -e "Eliminado *.out *.exe ...."
+	
+	@echo "Eliminado $(WARN_COLOR).out$(NO_COLOR) antiguo..."
 	@echo >> rm.out
-	$(CLEAN_COMMAND) *.out
+
+
+	($(CLEAN_COMMAND) *.out && echo "$(OK_COLOR)[OK]$(NO_COLOR)") \
+		||  (echo "$(ERROR_COLOR)[ERROR]$(NO_COLOR)" && exit 1; ) 
+
+
+	@echo "Eliminado $(WARN_COLOR).exe$(NO_COLOR) antiguo..."
 	@echo >> rm.exe
-	$(CLEAN_COMMAND) *.exe
-	@echo -e "$(OK_COLOR)[OK]$(NO_COLOR)"
-	@echo -e "Eliminado *.o ...."
-	@echo >> $(FIN_DIR)$(ADD_EXTEN)rm.o
-	$(CLEAN_COMMAND) $(FIN_DIR)$(ADD_EXTEN)*.o
-	@echo -e "$(OK_COLOR)[OK]$(NO_COLOR)"
-	cd ..
-	@echo -e "Limpieza de archivos residuales $(WARN_COLOR)completa!!$(NO_COLOR).\n\n"
+
+
+	($(CLEAN_COMMAND) *.exe && echo "$(OK_COLOR)[OK]$(NO_COLOR)") \
+		||  (echo "$(ERROR_COLOR)[ERROR]$(NO_COLOR)" && exit 1; ) 
+
+
+
+	@echo "Eliminado $(WARN_COLOR).o$(NO_COLOR) desactualizados..."
+	@echo >> $(OBJ)rm.o
+
+	($(CLEAN_COMMAND) $(OBJ)*.o && echo "$(OK_COLOR)[OK]$(NO_COLOR)") \
+		||  (echo "$(ERROR_COLOR)[ERROR]$(NO_COLOR)" && exit 1; ) 
+
+	@echo "Limpieza de archivos residuales $(OK_COLOR)completa!!$(NO_COLOR)"
+	@echo "$(PUR_COLOR)-------------------------------------------------------$(NO_COLOR)"
+
+.SILENT: clean all make main $(OBJ)%.o $(SOURCES) $(OBJECTS) main-child $(SRC)%.c main-debug
