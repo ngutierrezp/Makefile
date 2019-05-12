@@ -33,6 +33,8 @@ OPTION_COMPILE = -D DEBUG
 ADD_EXTEN = none
 RM_OBJ := none
 C_RM_OBJ := none
+C_DIR := none
+CLEAN_COMMAND_OBJ := none
 EXECUTABLE_NAME_DEBUG := $(EXECUTABLE_NAME)_debug
 
 
@@ -74,9 +76,11 @@ ifeq ($(OS),Windows_NT)
 	INCL_DIR := $(INCL_DIR)
 	OBJ := $(OBJ)
 	ADD_EXTEN :=\\
-	CLEAN_COMMAND := rm
+	CLEAN_COMMAND := cmd //C del
 	C_RM_OBJ := $(OBJ)/rm.o
-	RM_OBJ := $(OBJ)/*.o
+	RM_OBJ := $(OBJ)
+	C_DIR := cmd //C md $(OBJ)
+	CLEAN_COMMAND_OBJ := cmd //C rd //S //Q
 	ifeq ($(PROCESSOR_ARCHITECTURE),AMD64)
 		# x64
 		ARQUITECTURA = -D AMD64
@@ -96,8 +100,9 @@ else
 	ADD_EXTEN :=/
 	RM_OBJ := $(OBJ)/*.o
 	C_RM_OBJ := $(OBJ)/rm.o
+	C_DIR := @echo "."
 	CLEAN_COMMAND := rm -f
-
+	CLEAN_COMMAND_OBJ := rm -f
 	NO_COLOR :=\033[0;0m
 
 	OK_COLOR :=\033[0;32m
@@ -198,7 +203,7 @@ clean:
 	@echo >> $(C_RM_OBJ)
 
 	
-	($(CLEAN_COMMAND) $(RM_OBJ) && echo "$(OK_COLOR)[OK]$(NO_COLOR)") \
+	(($(CLEAN_COMMAND_OBJ) $(RM_OBJ) && $(C_DIR)) && echo "$(OK_COLOR)[OK]$(NO_COLOR)") \
 		||  (echo "$(ERROR_COLOR)[ERROR]$(NO_COLOR)" && exit 1; ) 
 
 	@echo "Limpieza de archivos residuales $(OK_COLOR)completa!!$(NO_COLOR)"
