@@ -1,3 +1,20 @@
+#############################################################################
+#							Makefile General 							   	#
+#				Autor:		Nicolas Gutierrez								#
+#				Fecha:			11/05/2019									#
+#																			#
+# Este programa tiene la finalidad de crear un ejecutable a partir de la   	#
+# compilacion de diferentes archivos .c									   	#
+# 																		   	#
+# Para utlizarlo correctamente, los archivos deben estar separados de la   	#
+# siguiente manera:															#
+#																			#
+# src/ <- debe incluir todos los .c del codigo								#
+# obj/ <- debe incluir todos los .o resultantes de la compilción			#
+# incl/ <- deben estar todas las librerias que utilizan los .c				#
+#																			#
+#############################################################################
+
 
 
 #############################################################################
@@ -10,23 +27,27 @@ SRC= src
 OBJ = obj
 INCL_DIR= include
 CLEAN_COMMAND = none
-COMPILE_COMMAND = gcc
+CC = gcc
 EXECUTABLE_NAME = lab
 OPTION_COMPILE = -D DEBUG
 ADD_EXTEN = none
+RM_OBJ := none
+C_RM_OBJ := none
 EXECUTABLE_NAME_DEBUG := $(EXECUTABLE_NAME)_debug
+
+
 ## Solo colores
-NO_COLOR= #\x1b[0m
+NO_COLOR=
 
-OK_COLOR= #\x1b[32;01m
+OK_COLOR= 
 
-ERROR_COLOR= #\x1b[31;01m
+ERROR_COLOR= 
 
-WARN_COLOR= #\x1b[33;01m
+WARN_COLOR= 
 
-SUSF_PRINT = #\e[1;34m
+SUSF_PRINT = 
 
-PUR_COLOR = #\033[0;35m
+PUR_COLOR = 
 
 
 
@@ -49,11 +70,13 @@ ifeq ($(OS),Windows_NT)
 
 	EXECUTABLE_NAME := $(EXECUTABLE_NAME).exe
 	EXECUTABLE_NAME_DEBUG := $(EXECUTABLE_NAME_DEBUG).exe
-	SRC := $(SRC)\\
-	INCL_DIR := $(INCL_DIR)\\
-	OBJ := $(OBJ)\\
-	ADD_EXTEN := 
-	CLEAN_COMMAND := del
+	SRC := $(SRC)
+	INCL_DIR := $(INCL_DIR)
+	OBJ := $(OBJ)
+	ADD_EXTEN :=\\
+	CLEAN_COMMAND := rm
+	C_RM_OBJ := $(OBJ)/rm.o
+	RM_OBJ := $(OBJ)/*.o
 	ifeq ($(PROCESSOR_ARCHITECTURE),AMD64)
 		# x64
 		ARQUITECTURA = -D AMD64
@@ -67,10 +90,12 @@ else
 
 	EXECUTABLE_NAME := $(EXECUTABLE_NAME).out
 	EXECUTABLE_NAME_DEBUG := $(EXECUTABLE_NAME_DEBUG).out
-	SRC := $(SRC)/
-	INCL_DIR := $(INCL_DIR)/
-	OBJ := $(OBJ)/
-	ADD_EXTEN := 
+	SRC := $(SRC)
+	INCL_DIR := $(INCL_DIR)
+	OBJ := $(OBJ)
+	ADD_EXTEN :=/
+	RM_OBJ := $(OBJ)/*.o
+	C_RM_OBJ := $(OBJ)/rm.o
 	CLEAN_COMMAND := rm -f
 
 	NO_COLOR :=\033[0;0m
@@ -112,17 +137,13 @@ endif
 #				Parte 2: Sentencias de compilacion  						#
 #############################################################################
 
-# Cada Makefile debe tener una sentencia "all" la cual compila todo como primera instruccion
-#
-#
-#
-#-------------------------------------------------------------------------
+
 ########################
 # Sentencia de Recetas #
 ########################
 
-SOURCES := $(wildcard $(SRC)*.c)
-OBJECTS := $(patsubst $(SRC)%.c, $(OBJ)%.o, $(SOURCES))
+SOURCES := $(wildcard $(SRC)/*.c)
+OBJECTS := $(patsubst $(SRC)/%.c, $(OBJ)/%.o, $(SOURCES))
 
 all: clean main
 	@echo "$(PUR_COLOR)Ejecutable generado!$(NO_COLOR) Nombre: $(OK_COLOR)$(EXECUTABLE_NAME)$(NO_COLOR) "
@@ -130,10 +151,14 @@ all: clean main
 
 main: $(OBJECTS)
 	@echo "Generando ejecutable ..."
-	($(CC) $^ -lm $(DEBUG_MODE) $(SISTEMA) -o $(EXECUTABLE_NAME) && echo "$(OK_COLOR)[OK]$(NO_COLOR)") \
+	($(CC) $^ -lm $(DEBUG_MODE) $(SISTEMA)  -o $(EXECUTABLE_NAME) && echo "$(OK_COLOR)[OK]$(NO_COLOR)") \
 		||  (echo "$(ERROR_COLOR)[ERROR]$(NO_COLOR)" && exit 1; )
 	@echo "\n"
 	
+$(OBJ)/%.o: $(SRC)/%.c
+	@echo "Generando archivos object de $@ ...."
+	($(CC) $(DEBUG_MODE) $(SISTEMA)  -lm -I$(SRC) -c $< -o $@ && echo "$(OK_COLOR)[OK]$(NO_COLOR)") \
+		||  (echo "$(ERROR_COLOR)[ERROR]$(NO_COLOR)" && exit 1; )
 
 debug: set-debug
 
@@ -146,16 +171,11 @@ all-debug: clean main-debug
 
 main-debug: $(OBJECTS)
 	@echo "Generando ejecutable ..."
-	($(CC) $^ -lm $(DEBUG_MODE) $(SISTEMA) -o $(EXE_NAME_DEBUG) && echo "$(OK_COLOR)[OK]$(NO_COLOR)") \
+	($(CC) $^ -lm $(DEBUG_MODE) $(SISTEMA) -o $(EXECUTABLE_NAME_DEBUG) && echo "$(OK_COLOR)[OK]$(NO_COLOR)") \
 		||  (echo "$(ERROR_COLOR)[ERROR]$(NO_COLOR)" && exit 1; )
 	@echo "\n"
 
-$(OBJ)%.o: $(SRC)%.c
-	@echo "Generando archivos object de $@ ...."
-	($(CC) $(DEBUG_MODE) $(SISTEMA) -lm -I$(SRC) -c $< -o $@ && echo "$(OK_COLOR)[OK]$(NO_COLOR)") \
-		||  (echo "$(ERROR_COLOR)[ERROR]$(NO_COLOR)" && exit 1; )
-
-clean: 
+clean:
 	
 	@echo "Eliminado $(WARN_COLOR).out$(NO_COLOR) antiguo..."
 	@echo >> rm.out
@@ -175,12 +195,13 @@ clean:
 
 
 	@echo "Eliminado $(WARN_COLOR).o$(NO_COLOR) desactualizados..."
-	@echo >> $(OBJ)rm.o
+	@echo >> $(C_RM_OBJ)
 
-	($(CLEAN_COMMAND) $(OBJ)*.o && echo "$(OK_COLOR)[OK]$(NO_COLOR)") \
+	
+	($(CLEAN_COMMAND) $(RM_OBJ) && echo "$(OK_COLOR)[OK]$(NO_COLOR)") \
 		||  (echo "$(ERROR_COLOR)[ERROR]$(NO_COLOR)" && exit 1; ) 
 
 	@echo "Limpieza de archivos residuales $(OK_COLOR)completa!!$(NO_COLOR)"
 	@echo "$(PUR_COLOR)-------------------------------------------------------$(NO_COLOR)"
 
-.SILENT: clean all make main $(OBJ)%.o $(SOURCES) $(OBJECTS) main-child $(SRC)%.c main-debug
+.SILENT: clean all make main $(OBJ)/%.o $(SOURCES) $(OBJECTS) main-child $(SRC)/%.c main-debug
