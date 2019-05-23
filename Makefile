@@ -10,7 +10,7 @@
 # siguiente manera:															#
 #																			#
 # src/ <- debe incluir todos los .c del codigo								#
-# obj/ <- debe incluir todos los .o resultantes de la compilción			#
+# obj/ <- debe incluir todos los .o resultantes de la compilci�n			#
 # incl/ <- deben estar todas las librerias que utilizan los .c				#
 #																			#
 #############################################################################
@@ -29,11 +29,12 @@ INCL_DIR= include
 CLEAN_COMMAND = none
 CC = gcc
 EXECUTABLE_NAME = lab
-OPTION_COMPILE = -D DEBUG
+OPTION_COMPILE = -DDEBUG
 ADD_EXTEN = none
 RM_OBJ := none
 C_RM_OBJ := none
 EXECUTABLE_NAME_DEBUG := $(EXECUTABLE_NAME)_debug
+CURRENT_DIR = $(shell pwd)
 
 
 ## Solo colores
@@ -74,7 +75,7 @@ ifeq ($(OS),Windows_NT)
 	INCL_DIR := $(INCL_DIR)
 	OBJ := $(OBJ)
 	ADD_EXTEN :=\\
-	CLEAN_COMMAND := rm
+	CLEAN_COMMAND := del
 	C_RM_OBJ := $(OBJ)/rm.o
 	RM_OBJ := $(OBJ)/*.o
 	ifeq ($(PROCESSOR_ARCHITECTURE),AMD64)
@@ -154,14 +155,8 @@ main: $(OBJECTS)
 	($(CC) $^ -lm $(DEBUG_MODE) $(SISTEMA)  -o $(EXECUTABLE_NAME) && echo "$(OK_COLOR)[OK]$(NO_COLOR)") \
 		||  (echo "$(ERROR_COLOR)[ERROR]$(NO_COLOR)" && exit 1; )
 	@echo "\n"
-	
-$(OBJ)/%.o: $(SRC)/%.c
-	@echo "Generando archivos object de $@ ...."
-	($(CC) $(DEBUG_MODE) $(SISTEMA)  -lm -I$(SRC) -c $< -o $@ && echo "$(OK_COLOR)[OK]$(NO_COLOR)") \
-		||  (echo "$(ERROR_COLOR)[ERROR]$(NO_COLOR)" && exit 1; )
 
 debug: set-debug
-
 set-debug: DEBUG_MODE := -DDEBUG
 set-debug: all-debug
 
@@ -171,15 +166,19 @@ all-debug: clean main-debug
 
 main-debug: $(OBJECTS)
 	@echo "Generando ejecutable ..."
-	($(CC) $^ -lm $(DEBUG_MODE) $(SISTEMA) -o $(EXECUTABLE_NAME_DEBUG) && echo "$(OK_COLOR)[OK]$(NO_COLOR)") \
+	($(CC) $^ -lm $(SISTEMA) -o $(EXECUTABLE_NAME_DEBUG) $(DEBUG_MODE) && echo "$(OK_COLOR)[OK]$(NO_COLOR)") \
 		||  (echo "$(ERROR_COLOR)[ERROR]$(NO_COLOR)" && exit 1; )
 	@echo "\n"
+
+$(OBJ)/%.o: $(SRC)/%.c
+	@echo "Generando archivos object de $@ ...."
+	($(CC) $(DEBUG_MODE) $(SISTEMA)  -lm -I$(SRC) -c $< -o $@ && echo "$(OK_COLOR)[OK]$(NO_COLOR)") \
+		||  (echo "$(ERROR_COLOR)[ERROR]$(NO_COLOR)" && exit 1; )
 
 clean:
 	
 	@echo "Eliminado $(WARN_COLOR).out$(NO_COLOR) antiguo..."
 	@echo >> rm.out
-
 
 	($(CLEAN_COMMAND) *.out && echo "$(OK_COLOR)[OK]$(NO_COLOR)") \
 		||  (echo "$(ERROR_COLOR)[ERROR]$(NO_COLOR)" && exit 1; ) 
@@ -193,13 +192,13 @@ clean:
 		||  (echo "$(ERROR_COLOR)[ERROR]$(NO_COLOR)" && exit 1; ) 
 
 
-
-	@echo "Eliminado $(WARN_COLOR).o$(NO_COLOR) desactualizados..."
+	@echo "Eliminado $(WARN_COLOR).o$(NO_COLOR) antiguo..."
 	@echo >> $(C_RM_OBJ)
 
-	
-	($(CLEAN_COMMAND) $(RM_OBJ) && echo "$(OK_COLOR)[OK]$(NO_COLOR)") \
-		||  (echo "$(ERROR_COLOR)[ERROR]$(NO_COLOR)" && exit 1; ) 
+
+	(cd $(OBJ) && $(CLEAN_COMMAND) *.o && echo "$(OK_COLOR)[OK]$(NO_COLOR)") \
+		||  (echo "$(ERROR_COLOR)[ERROR]$(NO_COLOR)" && exit 1; ) \
+	 
 
 	@echo "Limpieza de archivos residuales $(OK_COLOR)completa!!$(NO_COLOR)"
 	@echo "$(PUR_COLOR)-------------------------------------------------------$(NO_COLOR)"
