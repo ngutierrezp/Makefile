@@ -1,8 +1,9 @@
 #########################################################################################
-#					Makefile General 													#
+#								Makefile General 										#
+#																						#
 #				Autor:		Nicolas Gutierrez											#
 #				Fecha:		16/06/2019													#
-#				Versión:	3.7															#
+#				Versión:	3.7 ( windows 10+ / Linux ) 								#
 #																						#
 # Este programa tiene la finalidad de crear un ejecutable a partir de la   				#
 # compilacion de diferentes archivos .c													#
@@ -70,7 +71,9 @@ ifeq ($(OS),Windows_NT)
 	OP_BASH = -e
 	EXECUTABLE_NAME := $(EXECUTABLE_NAME).exe
 	EXECUTABLE_NAME_DEBUG := $(EXECUTABLE_NAME_DEBUG).exe
-	CLEAN_COMMAND := cmd //C del //Q //F
+	CLEAN_COMMAND := del
+	CLEAN_COMMAND_v2 = cmd //C del //Q //F
+	CLEAN_COMMAND_v3 = rm -f
 	ifeq ($(PROCESSOR_ARCHITECTURE),AMD64)
 		# x64
 		ARQUITECTURA = -D AMD64
