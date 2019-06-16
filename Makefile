@@ -32,7 +32,8 @@ SISTEMA = none
 ARQUITECTURA = none
 CLEAN_COMMAND = none
 EXECUTABLE_NAME = lab
-CLEAN_COMMAND_v2 = rm -f
+CLEAN_COMMAND_v2 = del
+CLEAN_COMMAND_v3 = rm -f
 OPTION_COMPILE = -DDEBUG -Wall
 EXECUTABLE_NAME_DEBUG := $(EXECUTABLE_NAME)_debug
 FILE1:= '\#include <stdio.h>\n\#include "../incl/example.h" \n\nint main(int argc, char const *argv[])\n{\n\tprintExample("This is a example of a complete program in C :D ");\n\treturn 0; \n}' 
@@ -189,7 +190,8 @@ clean:
 	@echo "Eliminado $(WARN_COLOR).out$(NO_COLOR) antiguo..."
 	@echo >> rm.out
 
-	($(CLEAN_COMMAND) *.out && echo "$(OK_COLOR)[OK]$(NO_COLOR)") \
+	(($(CLEAN_COMMAND) *.out || $(CLEAN_COMMAND_v2) *.out || $(CLEAN_COMMAND_v3) *.out ) \
+		&& echo "$(OK_COLOR)[OK]$(NO_COLOR)") \
 		||  (echo "$(ERROR_COLOR)[ERROR]$(NO_COLOR)" && exit 1; )
 
 
@@ -197,7 +199,8 @@ clean:
 	@echo >> rm.exe
 
 
-	($(CLEAN_COMMAND) *.exe && echo "$(OK_COLOR)[OK]$(NO_COLOR)") \
+	(($(CLEAN_COMMAND) *.exe || $(CLEAN_COMMAND_v2) *.exe || $(CLEAN_COMMAND_v3) *.exe ) \
+		&& echo "$(OK_COLOR)[OK]$(NO_COLOR)") \
 		||  (echo "$(ERROR_COLOR)[ERROR]$(NO_COLOR)" && exit 1; )
 
 
@@ -205,7 +208,8 @@ clean:
 	(cd $(OBJ) && echo >> rm.o )
 
 
-	(cd $(OBJ) && ($(CLEAN_COMMAND) *.o || $(CLEAN_COMMAND_v2) *.o ) && echo "$(OK_COLOR)[OK]$(NO_COLOR)") \
+	(cd $(OBJ) && ($(CLEAN_COMMAND) *.o || $(CLEAN_COMMAND_v2) *.o || $(CLEAN_COMMAND_v3) *.o ) \
+		&& echo "$(OK_COLOR)[OK]$(NO_COLOR)") \
 		||  (echo "$(ERROR_COLOR)[ERROR]$(NO_COLOR)" && exit 1; ) \
 
 
