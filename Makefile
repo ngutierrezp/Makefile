@@ -37,9 +37,6 @@ CLEAN_COMMAND_v2 = del
 CLEAN_COMMAND_v3 = rm -f
 OPTION_COMPILE = -DDEBUG -Wall
 EXECUTABLE_NAME_DEBUG := $(EXECUTABLE_NAME)_debug
-FILE1:= '\#include <stdio.h>\n\#include "../incl/example.h" \n\nint main(int argc, char const *argv[])\n{\n\tprintExample("This is a example of a complete program in C :D ");\n\treturn 0; \n}' 
-FILE2:= '\#include <stdio.h>\n\#include "../incl/example.h"\n\nvoid printExample(char* text){\n\tprintf("%s",text);\n}'
-FILE3:= '\#ifndef EXAMPLE_H\n\#define EXAMPLE_H\n/*\n * This is a function for test\n * please remove this file and .c\n */\nvoid printExample(char* text);\n\#endif'
 
 ## Solo colores
 NO_COLOR=
@@ -157,15 +154,15 @@ init:
 		||  (echo "$(ERROR_COLOR)[ERROR]$(NO_COLOR)" && exit 1; )
 
 	@echo "Generando $(WARN_COLOR)Archivo example.c$(NO_COLOR) en carpetas ..."
-	((cd $(SRC) && echo $(OP_BASH) $(FILE2) >> example.c) && echo "$(OK_COLOR)[OK]$(NO_COLOR)") \
+	((cd $(SRC) && echo >> example.c) && echo "$(OK_COLOR)[OK]$(NO_COLOR)") \
 		||  (echo "$(ERROR_COLOR)[ERROR]$(NO_COLOR)" && exit 1; )
 
 	@echo "Generando $(WARN_COLOR)Archivo example.h$(NO_COLOR) en carpetas ..."
-	((cd $(INCL) && echo $(OP_BASH) $(FILE3) >> example.h) && echo "$(OK_COLOR)[OK]$(NO_COLOR)") \
+	((cd $(INCL) && echo >> example.h) && echo "$(OK_COLOR)[OK]$(NO_COLOR)") \
 		||  (echo "$(ERROR_COLOR)[ERROR]$(NO_COLOR)" && exit 1; )
 
 	@echo "Generando $(WARN_COLOR)Archivo main.c$(NO_COLOR) en carpetas ..."
-	((cd $(SRC) && echo $(OP_BASH) $(FILE1) >> main.c) && echo "$(OK_COLOR)[OK]$(NO_COLOR)") \
+	((cd $(SRC) && echo >> main.c) && echo "$(OK_COLOR)[OK]$(NO_COLOR)") \
 		||  (echo "$(ERROR_COLOR)[ERROR]$(NO_COLOR)" && exit 1; ) 
 
 
