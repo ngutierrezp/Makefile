@@ -1,26 +1,26 @@
-#############################################################################
-#							Makefile General 							   	#
-#				Autor:		Nicolas Gutierrez								#
-#				Fecha:			16/06/2019									#
-#				Versión:			3.7										#
-#																			#
-# Este programa tiene la finalidad de crear un ejecutable a partir de la   	#
-# compilacion de diferentes archivos .c									   	#
-# 																		   	#
-# Para utlizarlo correctamente, los archivos deben estar separados de la   	#
-# siguiente manera:															#
-#																			#
-# src/ <- debe incluir todos los .c del codigo								#
+#########################################################################################
+#					Makefile General 				#
+#				Autor:		Nicolas Gutierrez			#
+#				Fecha:		16/06/2019				#
+#				Versión:	3.7					#
+#											#
+# Este programa tiene la finalidad de crear un ejecutable a partir de la   		#
+# compilacion de diferentes archivos .c							#
+# 											#
+# Para utlizarlo correctamente, los archivos deben estar separados de la   		#
+# siguiente manera:									#
+#											#
+# src/ <- debe incluir todos los .c del codigo						#
 # obj/ <- debe incluir todos los .o resultantes de la compilci�n			#
 # incl/ <- deben estar todas las librerias que utilizan los .c				#
-#																			#
-#############################################################################
+#											#
+#########################################################################################
 
 
 
-#############################################################################
-#				Parte 0: Definicion de variables    						#
-#############################################################################
+#################################################################################
+#				Parte 0: Definicion de variables    		#
+#################################################################################
 
 CC = gcc
 SRC= src
@@ -53,9 +53,9 @@ SUSF_PRINT =
 PUR_COLOR =
 
 
-#############################################################################
-#				Parte 1: Detectando Sistema Operativo						#
-#############################################################################
+#################################################################################
+#				Parte 1: Detectando Sistema Operativo		#
+#################################################################################
 
 # Detect operating system in Makefile.
 # Author: He Tao
@@ -124,9 +124,9 @@ endif
 
 
 
-#############################################################################
-#				Parte 2: Sentencias de compilacion  						#
-#############################################################################
+#################################################################################
+#				Parte 2: Sentencias de compilacion  		#
+#################################################################################
 
 
 ########################
