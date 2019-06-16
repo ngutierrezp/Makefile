@@ -1,7 +1,8 @@
 #############################################################################
 #							Makefile General 							   	#
 #				Autor:		Nicolas Gutierrez								#
-#				Fecha:			11/05/2019									#
+#				Fecha:			16/06/2019									#
+#				Versión:			3.7										#
 #																			#
 # Este programa tiene la finalidad de crear un ejecutable a partir de la   	#
 # compilacion de diferentes archivos .c									   	#
@@ -21,38 +22,35 @@
 #				Parte 0: Definicion de variables    						#
 #############################################################################
 
-ARQUITECTURA = none
-SISTEMA = none 
+CC = gcc
 SRC= src
 OBJ = obj
-INCL_DIR= include
+INCL= incl
+MKDIR = mkdir
+OP_BASH = none
+SISTEMA = none
+ARQUITECTURA = none
 CLEAN_COMMAND = none
-CC = gcc
 EXECUTABLE_NAME = lab
-OPTION_COMPILE = -DDEBUG
-ADD_EXTEN = none
-RM_OBJ := none
-C_RM_OBJ := none
+CLEAN_COMMAND_v2 = rm -f
+OPTION_COMPILE = -DDEBUG -Wall
 EXECUTABLE_NAME_DEBUG := $(EXECUTABLE_NAME)_debug
-CURRENT_DIR = $(shell pwd)
-
+FILE1:= '\#include <stdio.h>\n\#include "../incl/example.h" \n\nint main(int argc, char const *argv[])\n{\n\tprintExample("This is a example of a complete program in C :D ");\n\treturn 0; \n}' 
+FILE2:= '\#include <stdio.h>\n\#include "../incl/example.h"\n\nvoid printExample(char* text){\n\tprintf("%s",text);\n}'
+FILE3:= '\#ifndef EXAMPLE_H\n\#define EXAMPLE_H\n/*\n * This is a function for test\n * please remove this file and .c\n */\nvoid printExample(char* text);\n\#endif'
 
 ## Solo colores
 NO_COLOR=
 
-OK_COLOR= 
+OK_COLOR=
 
-ERROR_COLOR= 
+ERROR_COLOR=
 
-WARN_COLOR= 
+WARN_COLOR=
 
-SUSF_PRINT = 
+SUSF_PRINT =
 
-PUR_COLOR = 
-
-
-
-
+PUR_COLOR =
 
 
 #############################################################################
@@ -68,16 +66,10 @@ PUR_COLOR =
 ### WINDOWS ###
 ifeq ($(OS),Windows_NT)
 	SISTEMA = -D WINDOWS
-
+	OP_BASH = -e
 	EXECUTABLE_NAME := $(EXECUTABLE_NAME).exe
 	EXECUTABLE_NAME_DEBUG := $(EXECUTABLE_NAME_DEBUG).exe
-	SRC := $(SRC)
-	INCL_DIR := $(INCL_DIR)
-	OBJ := $(OBJ)
-	ADD_EXTEN :=\\
-	CLEAN_COMMAND := del
-	C_RM_OBJ := $(OBJ)/rm.o
-	RM_OBJ := $(OBJ)/*.o
+	CLEAN_COMMAND := cmd //C del //Q //F
 	ifeq ($(PROCESSOR_ARCHITECTURE),AMD64)
 		# x64
 		ARQUITECTURA = -D AMD64
@@ -89,14 +81,12 @@ ifeq ($(OS),Windows_NT)
 else
 #### PARA EL RESTO DE OS ####
 
+	OP_BASH =
+
 	EXECUTABLE_NAME := $(EXECUTABLE_NAME).out
+
 	EXECUTABLE_NAME_DEBUG := $(EXECUTABLE_NAME_DEBUG).out
-	SRC := $(SRC)
-	INCL_DIR := $(INCL_DIR)
-	OBJ := $(OBJ)
-	ADD_EXTEN :=/
-	RM_OBJ := $(OBJ)/*.o
-	C_RM_OBJ := $(OBJ)/rm.o
+
 	CLEAN_COMMAND := rm -f
 
 	NO_COLOR :=\033[0;0m
@@ -156,6 +146,25 @@ main: $(OBJECTS)
 		||  (echo "$(ERROR_COLOR)[ERROR]$(NO_COLOR)" && exit 1; )
 	@echo "\n"
 
+init:
+	@echo "Inicializando programa: "
+	@echo "Generando carpetas contenedoras ..."
+	($(MKDIR) $(SRC) $(OBJ) $(INCL) && echo "$(OK_COLOR)[OK]$(NO_COLOR)") \
+		||  (echo "$(ERROR_COLOR)[ERROR]$(NO_COLOR)" && exit 1; )
+
+	@echo "Generando $(WARN_COLOR)Archivo example.c$(NO_COLOR) en carpetas ..."
+	((cd $(SRC) && echo $(OP_BASH) $(FILE2) >> example.c) && echo "$(OK_COLOR)[OK]$(NO_COLOR)") \
+		||  (echo "$(ERROR_COLOR)[ERROR]$(NO_COLOR)" && exit 1; )
+
+	@echo "Generando $(WARN_COLOR)Archivo example.h$(NO_COLOR) en carpetas ..."
+	((cd $(INCL) && echo $(OP_BASH) $(FILE3) >> example.h) && echo "$(OK_COLOR)[OK]$(NO_COLOR)") \
+		||  (echo "$(ERROR_COLOR)[ERROR]$(NO_COLOR)" && exit 1; )
+
+	@echo "Generando $(WARN_COLOR)Archivo main.c$(NO_COLOR) en carpetas ..."
+	((cd $(SRC) && echo $(OP_BASH) $(FILE1) >> main.c) && echo "$(OK_COLOR)[OK]$(NO_COLOR)") \
+		||  (echo "$(ERROR_COLOR)[ERROR]$(NO_COLOR)" && exit 1; ) 
+
+
 debug: set-debug
 set-debug: DEBUG_MODE := -DDEBUG
 set-debug: all-debug
@@ -176,12 +185,12 @@ $(OBJ)/%.o: $(SRC)/%.c
 		||  (echo "$(ERROR_COLOR)[ERROR]$(NO_COLOR)" && exit 1; )
 
 clean:
-	
+
 	@echo "Eliminado $(WARN_COLOR).out$(NO_COLOR) antiguo..."
 	@echo >> rm.out
 
 	($(CLEAN_COMMAND) *.out && echo "$(OK_COLOR)[OK]$(NO_COLOR)") \
-		||  (echo "$(ERROR_COLOR)[ERROR]$(NO_COLOR)" && exit 1; ) 
+		||  (echo "$(ERROR_COLOR)[ERROR]$(NO_COLOR)" && exit 1; )
 
 
 	@echo "Eliminado $(WARN_COLOR).exe$(NO_COLOR) antiguo..."
@@ -189,18 +198,18 @@ clean:
 
 
 	($(CLEAN_COMMAND) *.exe && echo "$(OK_COLOR)[OK]$(NO_COLOR)") \
-		||  (echo "$(ERROR_COLOR)[ERROR]$(NO_COLOR)" && exit 1; ) 
+		||  (echo "$(ERROR_COLOR)[ERROR]$(NO_COLOR)" && exit 1; )
 
 
 	@echo "Eliminado $(WARN_COLOR).o$(NO_COLOR) antiguo..."
-	@echo >> $(C_RM_OBJ)
+	(cd $(OBJ) && echo >> rm.o )
 
 
-	(cd $(OBJ) && $(CLEAN_COMMAND) *.o && echo "$(OK_COLOR)[OK]$(NO_COLOR)") \
+	(cd $(OBJ) && ($(CLEAN_COMMAND) *.o || $(CLEAN_COMMAND_v2) *.o ) && echo "$(OK_COLOR)[OK]$(NO_COLOR)") \
 		||  (echo "$(ERROR_COLOR)[ERROR]$(NO_COLOR)" && exit 1; ) \
-	 
+
 
 	@echo "Limpieza de archivos residuales $(OK_COLOR)completa!!$(NO_COLOR)"
 	@echo "$(PUR_COLOR)-------------------------------------------------------$(NO_COLOR)"
 
-.SILENT: clean all make main $(OBJ)/%.o $(SOURCES) $(OBJECTS) main-child $(SRC)/%.c main-debug
+.SILENT: clean all make main $(OBJ)/%.o $(SOURCES) $(OBJECTS) init $(SRC)/%.c main-debug
