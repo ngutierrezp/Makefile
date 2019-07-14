@@ -3,7 +3,7 @@
 #																
 #				Autor:		Nicolas Gutierrez					
 #				Fecha:		16/06/2019							
-#				Versión:	3.8 ( windows 10+ / Linux ) 		
+#				Versión:	3.9 ( windows 10+ / Linux ) 		
 #																
 # Este programa tiene la finalidad de crear un ejecutable a partir de la 
 # compilacion de diferentes archivos .c							
