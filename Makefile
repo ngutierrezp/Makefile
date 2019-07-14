@@ -27,6 +27,7 @@ CC = gcc
 SRC= src
 OBJ = obj
 INCL= incl
+LOCAL = false
 MKDIR = mkdir
 OP_BASH = none
 SISTEMA = none
@@ -141,24 +142,30 @@ SOURCES := $(wildcard $(SRC)/*.c)
 OBJECTS := $(patsubst $(SRC)/%.c, $(OBJ)/%.o, $(SOURCES))
 
 all: clean main
+	$(eval LOCAL=true)
 	@echo "$(PUR_COLOR)Ejecutable generado!$(NO_COLOR) Nombre: $(OK_COLOR)$(EXECUTABLE_NAME)$(NO_COLOR) "
 
 
 main: $(OBJECTS)
+	$(eval LOCAL=true)
 	@echo "Generando ejecutable ..."
 	($(CC) $^ -lm $(DEBUG_MODE) $(SISTEMA)  -o $(EXECUTABLE_NAME) && echo "$(OK_COLOR)[OK]$(NO_COLOR)") \
 		||  (echo "$(ERROR_COLOR)[ERROR]$(NO_COLOR)" && exit 1; )
 	@echo "\n"
 
 debug: set-debug
+	$(eval LOCAL=true)
 set-debug: DEBUG_MODE := -DDEBUG
 set-debug: all-debug
+	$(eval LOCAL=true)
 
 all-debug: clean main-debug
+	$(eval LOCAL=true)
 	@echo "$(ERROR_COLOR)[DEBUG MODE] $(PUR_COLOR)Ejecutable generado!$(NO_COLOR) Nombre: $(OK_COLOR)$(EXECUTABLE_NAME_DEBUG)$(NO_COLOR) "
 
 
 main-debug: $(OBJECTS)
+	$(eval LOCAL=true)
 	@echo "Generando ejecutable ..."
 	($(CC) $^ -lm $(SISTEMA) -o $(EXECUTABLE_NAME_DEBUG) $(DEBUG_MODE) && echo "$(OK_COLOR)[OK]$(NO_COLOR)") \
 		||  (echo "$(ERROR_COLOR)[ERROR]$(NO_COLOR)" && exit 1; )
@@ -168,9 +175,10 @@ $(OBJ)/%.o: $(SRC)/%.c
 	@echo "Generando archivos object de $@ ...."
 	($(CC) $(DEBUG_MODE) $(SISTEMA)  -lm -I$(SRC) -c $< -o $@ && echo "$(OK_COLOR)[OK]$(NO_COLOR)") \
 		||  (echo "$(ERROR_COLOR)[ERROR]$(NO_COLOR)" && exit 1; )
+	$(eval LOCAL=true)
 
 clean:
-
+	$(eval LOCAL=true)
 	@echo "Eliminado $(WARN_COLOR).out$(NO_COLOR) antiguo..."
 	@echo >> rm.out
 
@@ -211,7 +219,7 @@ upper = $(shell echo $1 | tr a-z A-Z)
 
 NEW := false 
 
-init:
+install:
 	@echo "Inicializando programa: "
 	@echo "Generando carpetas contenedoras ..."
 	($(MKDIR) $(SRC) $(OBJ) $(INCL) && echo "$(OK_COLOR)[OK]$(NO_COLOR)") \
@@ -227,16 +235,23 @@ init:
 
 	@echo "Generando $(WARN_COLOR)Archivo main.c$(NO_COLOR) en carpetas ..."
 	((cd $(SRC) && echo $(OP_BASH) $(FILE1) >> main.c) && echo "$(OK_COLOR)[OK]$(NO_COLOR)") \
-		||  (echo "$(ERROR_COLOR)[ERROR]$(NO_COLOR)" && exit 1; ) 
+		||  (echo "$(ERROR_COLOR)[ERROR]$(NO_COLOR)" && exit 1; )
+	$(eval LOCAL=true) 
 
-new: NEW := true
+
 new:
 	@echo "Creando archivos en la carpeta: $(filter-out $@,$(MAKECMDGOALS))"
-	
+	$(eval NEW=true)
+
 %:
-	@if [ $(NEW) ]; then \
+	@if [ $(NEW) = true ]; then \
 		echo "generando archivo $(WARN_COLOR)$@.c$(NO_COLOR) y $(WARN_COLOR)$@.h$(NO_COLOR) ";   \
     	((cd $(SRC) && echo $(OP_BASH) '#include "../$(INCL)/$@.h"'  >> $@.c) \
 		&& (cd $(INCL) && echo $(OP_BASH) '#ifndef $(call upper,$@_H)\n#define $(call upper,$@_H)\n\n\n\n#endif' >> $@.h) \
-		&& echo "$(OK_COLOR)[OK]$(NO_COLOR)") || (echo "$(ERROR_COLOR)[ERROR]$(NO_COLOR)" && exit 1; );\
+		&& echo "$(OK_COLOR)[OK]$(NO_COLOR)") || (echo "$(ERROR_COLOR)[ERROR]$(NO_COLOR)" && exit 1; ); \
+	else \
+		if [ $(LOCAL) = false ]; then \
+			echo "$(ERROR_COLOR) $@ $(NO_COLOR)no se reconoce como un comando de este Makefile "; \
+		fi \
 	fi
+	
