@@ -1,32 +1,33 @@
-#########################################################################################
-#								Makefile General 										#
-#																						#
-#				Autor:		Nicolas Gutierrez											#
-#				Fecha:		16/06/2019													#
-#				Versión:	3.7 ( windows 10+ / Linux ) 								#
-#																						#
-# Este programa tiene la finalidad de crear un ejecutable a partir de la   				#
-# compilacion de diferentes archivos .c													#
-# 																						#
-# Para utlizarlo correctamente, los archivos deben estar separados de la   				#
-# siguiente manera:																		#
-#																						#
-# src/ <- debe incluir todos los .c del codigo											#
-# obj/ <- debe incluir todos los .o resultantes de la compilci�n						#
-# incl/ <- deben estar todas las librerias que utilizan los .c							#
-#																						#
-#########################################################################################
+##############################################################################
+#						Makefile General 				
+#																
+#				Autor:		Nicolas Gutierrez					
+#				Fecha:		16/06/2019							
+#				Versión:	3.8 ( windows 10+ / Linux ) 		
+#																
+# Este programa tiene la finalidad de crear un ejecutable a partir de la 
+# compilacion de diferentes archivos .c							
+# 																
+# Para utlizarlo correctamente, los archivos deben estar separados de la 
+# siguiente manera:												
+#																
+# src/ <- debe incluir todos los .c del codigo					
+# obj/ <- debe incluir todos los .o resultantes de la compilci�n
+# incl/ <- deben estar todas las librerias que utilizan los .c	
+#																
+#############################################################################
 
 
 
-#################################################################################
-#				Parte 0: Definicion de variables    							#
-#################################################################################
+############################################################################
+#				Parte 0: Definicion de variables    					
+############################################################################
 
 CC = gcc
 SRC= src
 OBJ = obj
 INCL= incl
+LOCAL = false
 MKDIR = mkdir
 OP_BASH = none
 SISTEMA = none
@@ -55,9 +56,9 @@ SUSF_PRINT =
 PUR_COLOR =
 
 
-#################################################################################
-#				Parte 1: Detectando Sistema Operativo							#
-#################################################################################
+############################################################################
+#				Parte 1: Detectando Sistema Operativo						
+############################################################################
 
 # Detect operating system in Makefile.
 # Author: He Tao
@@ -128,9 +129,9 @@ endif
 
 
 
-#################################################################################
-#				Parte 2: Sentencias de compilacion  							#
-#################################################################################
+########################################################################
+#				Parte 2: Sentencias de compilacion  					
+########################################################################
 
 
 ########################
@@ -141,43 +142,30 @@ SOURCES := $(wildcard $(SRC)/*.c)
 OBJECTS := $(patsubst $(SRC)/%.c, $(OBJ)/%.o, $(SOURCES))
 
 all: clean main
+	$(eval LOCAL=true)
 	@echo "$(PUR_COLOR)Ejecutable generado!$(NO_COLOR) Nombre: $(OK_COLOR)$(EXECUTABLE_NAME)$(NO_COLOR) "
 
 
 main: $(OBJECTS)
+	$(eval LOCAL=true)
 	@echo "Generando ejecutable ..."
 	($(CC) $^ -lm $(DEBUG_MODE) $(SISTEMA)  -o $(EXECUTABLE_NAME) && echo "$(OK_COLOR)[OK]$(NO_COLOR)") \
 		||  (echo "$(ERROR_COLOR)[ERROR]$(NO_COLOR)" && exit 1; )
 	@echo "\n"
 
-init:
-	@echo "Inicializando programa: "
-	@echo "Generando carpetas contenedoras ..."
-	($(MKDIR) $(SRC) $(OBJ) $(INCL) && echo "$(OK_COLOR)[OK]$(NO_COLOR)") \
-		||  (echo "$(ERROR_COLOR)[ERROR]$(NO_COLOR)" && exit 1; )
-
-	@echo "Generando $(WARN_COLOR)Archivo example.c$(NO_COLOR) en carpetas ..."
-	((cd $(SRC) && echo $(OP_BASH) $(FILE2) >> example.c) && echo "$(OK_COLOR)[OK]$(NO_COLOR)") \
-		||  (echo "$(ERROR_COLOR)[ERROR]$(NO_COLOR)" && exit 1; )
-
-	@echo "Generando $(WARN_COLOR)Archivo example.h$(NO_COLOR) en carpetas ..."
-	((cd $(INCL) && echo $(OP_BASH) $(FILE3) >> example.h) && echo "$(OK_COLOR)[OK]$(NO_COLOR)") \
-		||  (echo "$(ERROR_COLOR)[ERROR]$(NO_COLOR)" && exit 1; )
-
-	@echo "Generando $(WARN_COLOR)Archivo main.c$(NO_COLOR) en carpetas ..."
-	((cd $(SRC) && echo $(OP_BASH) $(FILE1) >> main.c) && echo "$(OK_COLOR)[OK]$(NO_COLOR)") \
-		||  (echo "$(ERROR_COLOR)[ERROR]$(NO_COLOR)" && exit 1; ) 
-
-
 debug: set-debug
+	$(eval LOCAL=true)
 set-debug: DEBUG_MODE := -DDEBUG
 set-debug: all-debug
+	$(eval LOCAL=true)
 
 all-debug: clean main-debug
+	$(eval LOCAL=true)
 	@echo "$(ERROR_COLOR)[DEBUG MODE] $(PUR_COLOR)Ejecutable generado!$(NO_COLOR) Nombre: $(OK_COLOR)$(EXECUTABLE_NAME_DEBUG)$(NO_COLOR) "
 
 
 main-debug: $(OBJECTS)
+	$(eval LOCAL=true)
 	@echo "Generando ejecutable ..."
 	($(CC) $^ -lm $(SISTEMA) -o $(EXECUTABLE_NAME_DEBUG) $(DEBUG_MODE) && echo "$(OK_COLOR)[OK]$(NO_COLOR)") \
 		||  (echo "$(ERROR_COLOR)[ERROR]$(NO_COLOR)" && exit 1; )
@@ -187,9 +175,10 @@ $(OBJ)/%.o: $(SRC)/%.c
 	@echo "Generando archivos object de $@ ...."
 	($(CC) $(DEBUG_MODE) $(SISTEMA)  -lm -I$(SRC) -c $< -o $@ && echo "$(OK_COLOR)[OK]$(NO_COLOR)") \
 		||  (echo "$(ERROR_COLOR)[ERROR]$(NO_COLOR)" && exit 1; )
+	$(eval LOCAL=true)
 
 clean:
-
+	$(eval LOCAL=true)
 	@echo "Eliminado $(WARN_COLOR).out$(NO_COLOR) antiguo..."
 	@echo >> rm.out
 
@@ -220,3 +209,49 @@ clean:
 	@echo "$(PUR_COLOR)-------------------------------------------------------$(NO_COLOR)"
 
 .SILENT: clean all make main $(OBJ)/%.o $(SOURCES) $(OBJECTS) init $(SRC)/%.c main-debug
+
+
+###########################################################################
+#				Parte 2: Sentencias de Framework	  						
+###########################################################################
+
+upper = $(shell echo $1 | tr a-z A-Z)
+
+NEW := false 
+
+install:
+	@echo "Inicializando programa: "
+	@echo "Generando carpetas contenedoras ..."
+	($(MKDIR) $(SRC) $(OBJ) $(INCL) && echo "$(OK_COLOR)[OK]$(NO_COLOR)") \
+		||  (echo "$(ERROR_COLOR)[ERROR]$(NO_COLOR)" && exit 1; )
+
+	@echo "Generando $(WARN_COLOR)Archivo example.c$(NO_COLOR) en carpetas ..."
+	((cd $(SRC) && echo $(OP_BASH) $(FILE2) >> example.c) && echo "$(OK_COLOR)[OK]$(NO_COLOR)") \
+		||  (echo "$(ERROR_COLOR)[ERROR]$(NO_COLOR)" && exit 1; )
+
+	@echo "Generando $(WARN_COLOR)Archivo example.h$(NO_COLOR) en carpetas ..."
+	((cd $(INCL) && echo $(OP_BASH) $(FILE3) >> example.h) && echo "$(OK_COLOR)[OK]$(NO_COLOR)") \
+		||  (echo "$(ERROR_COLOR)[ERROR]$(NO_COLOR)" && exit 1; )
+
+	@echo "Generando $(WARN_COLOR)Archivo main.c$(NO_COLOR) en carpetas ..."
+	((cd $(SRC) && echo $(OP_BASH) $(FILE1) >> main.c) && echo "$(OK_COLOR)[OK]$(NO_COLOR)") \
+		||  (echo "$(ERROR_COLOR)[ERROR]$(NO_COLOR)" && exit 1; )
+	$(eval LOCAL=true) 
+
+
+new:
+	@echo "Creando archivos en la carpeta: $(filter-out $@,$(MAKECMDGOALS))"
+	$(eval NEW=true)
+
+%:
+	@if [ $(NEW) = true ]; then \
+		echo "generando archivo $(WARN_COLOR)$@.c$(NO_COLOR) y $(WARN_COLOR)$@.h$(NO_COLOR) ";   \
+    	((cd $(SRC) && echo $(OP_BASH) '#include "../$(INCL)/$@.h"'  >> $@.c) \
+		&& (cd $(INCL) && echo $(OP_BASH) '#ifndef $(call upper,$@_H)\n#define $(call upper,$@_H)\n\n\n\n#endif' >> $@.h) \
+		&& echo "$(OK_COLOR)[OK]$(NO_COLOR)") || (echo "$(ERROR_COLOR)[ERROR]$(NO_COLOR)" && exit 1; ); \
+	else \
+		if [ $(LOCAL) = false ]; then \
+			echo "$(ERROR_COLOR) $@ $(NO_COLOR)no se reconoce como un comando de este Makefile "; \
+		fi \
+	fi
+	
