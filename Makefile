@@ -2,8 +2,8 @@
 #						Makefile General 				
 #																
 #				Autor:		Nicolas Gutierrez					
-#				Fecha:		16/06/2019							
-#				Versión:	3.9 ( windows 10+ / Linux ) 		
+#				Fecha:		03/09/2019							
+#				Versión:	3.11 ( windows 10+ / Linux ) 		
 #																
 # Este programa tiene la finalidad de crear un ejecutable a partir de la 
 # compilacion de diferentes archivos .c							
@@ -241,13 +241,26 @@ install:
 
 new:
 	@echo "Creando archivos en la carpeta: $(filter-out $@,$(MAKECMDGOALS))"
+	$(eval LOCAL=true) 
 	$(eval NEW=true)
+
+rm:
+	@echo "Eliminando archivos $(WARN_COLOR)$(filter-out $@,$(MAKECMDGOALS))$(NO_COLOR) (.c y .h)"
+	$(eval LOCAL=true)
+	$(eval RM=true)
+
+
 
 %:
 	@if [ $(NEW) = true ]; then \
 		echo "generando archivo $(WARN_COLOR)$@.c$(NO_COLOR) y $(WARN_COLOR)$@.h$(NO_COLOR) ";   \
     	((cd $(SRC) && echo $(OP_BASH) '#include "../$(INCL)/$@.h"'  >> $@.c) \
 		&& (cd $(INCL) && echo $(OP_BASH) '#ifndef $(call upper,$@_H)\n#define $(call upper,$@_H)\n\n\n\n#endif' >> $@.h) \
+		&& echo "$(OK_COLOR)[OK]$(NO_COLOR)") || (echo "$(ERROR_COLOR)[ERROR]$(NO_COLOR)" && exit 1; ); \
+	elif [ $(RM) = true ]; then \
+		echo "eliminando $(ERROR_COLOR) $@ $(NO_COLOR)"; \
+		((cd $(SRC) && ($(CLEAN_COMMAND) $@.c || $(CLEAN_COMMAND_v2) $@.c || $(CLEAN_COMMAND_v3) $@.c )) \
+		&& (cd $(INCL) && ($(CLEAN_COMMAND) $@.h || $(CLEAN_COMMAND_v2) $@.h || $(CLEAN_COMMAND_v3) $@.h ) ) \
 		&& echo "$(OK_COLOR)[OK]$(NO_COLOR)") || (echo "$(ERROR_COLOR)[ERROR]$(NO_COLOR)" && exit 1; ); \
 	else \
 		if [ $(LOCAL) = false ]; then \
