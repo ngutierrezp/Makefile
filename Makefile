@@ -228,7 +228,7 @@ clean:
 	@echo "Limpieza de archivos residuales $(OK_COLOR)completa!!$(NO_COLOR)"
 	@echo "$(PUR_COLOR)-------------------------------------------------------$(NO_COLOR)"
 
-.SILENT: clean all make main $(OBJ)/%.o $(SOURCES) $(OBJECTS) init $(SRC)/%.c main-debug
+.SILENT: clean all make main $(OBJ)/%.o $(SOURCES) $(OBJECTS) install $(SRC)/%.c main-debug rm
 
 
 ###########################################################################
