@@ -49,7 +49,7 @@ A continuación se detallan los comandos permitos por el Makefile.
 Este comando inicia la estructura por defecto para utilizar el Makefile. Al usar el comando se crea en la carpeta de origen las siguientes 3 carpetas. 
 
 
-```bash
+```
 ├── root/
 │   └── src/
 |   |    └── main.c
