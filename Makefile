@@ -2,8 +2,10 @@
 #						Makefile General 				
 #																
 #				Autor:		Nicolas Gutierrez					
-#				Fecha:		03/09/2019							
-#				Versión:	3.11 ( windows 10+ / Linux ) 		
+#				Fecha:		07/09/2019							
+#				Versión:	4.1 ( windows 10+ / Linux )
+# 				Repositorio : https://github.com/ngutierrezp/GeneralMakefile
+#		
 #																
 # Este programa tiene la finalidad de crear un ejecutable a partir de la 
 # compilacion de diferentes archivos .c							
@@ -12,7 +14,7 @@
 # siguiente manera:												
 #																
 # src/ <- debe incluir todos los .c del codigo					
-# obj/ <- debe incluir todos los .o resultantes de la compilci�n
+# obj/ <- debe incluir todos los .o resultantes de la compilcion
 # incl/ <- deben estar todas las librerias que utilizan los .c	
 #																
 #############################################################################
@@ -26,11 +28,13 @@
 CC = gcc
 SRC= src
 OBJ = obj
+RM = none
 INCL= incl
 LOCAL = false
 MKDIR = mkdir
 OP_BASH = none
 SISTEMA = none
+COMPILED = false
 ARQUITECTURA = none
 CLEAN_COMMAND = none
 EXECUTABLE_NAME = lab
@@ -141,20 +145,34 @@ endif
 SOURCES := $(wildcard $(SRC)/*.c)
 OBJECTS := $(patsubst $(SRC)/%.c, $(OBJ)/%.o, $(SOURCES))
 
-all: clean main
+all: main
 	$(eval LOCAL=true)
 	@echo "$(PUR_COLOR)Ejecutable generado!$(NO_COLOR) Nombre: $(OK_COLOR)$(EXECUTABLE_NAME)$(NO_COLOR) "
 
 
 main: $(OBJECTS)
 	$(eval LOCAL=true)
-	@echo "Generando ejecutable ..."
-	($(CC) $^ -lm $(DEBUG_MODE) $(SISTEMA)  -o $(EXECUTABLE_NAME) && echo "$(OK_COLOR)[OK]$(NO_COLOR)") \
-		||  (echo "$(ERROR_COLOR)[ERROR]$(NO_COLOR)" && exit 1; )
-	@echo "\n"
+	@if [ $(COMPILED) = false ]; then \
+		echo "$(OK_COLOR)**************************************************$(NO_COLOR)"; \
+		echo "$(OK_COLOR)*$(NO_COLOR)  No existen cambios, no se volverá a compilar  $(OK_COLOR)*$(NO_COLOR)"; \
+		echo "$(OK_COLOR)**************************************************$(NO_COLOR)"; \
+	else \
+		echo "Generando ejecutable ..."; \
+		($(CC) $^ -lm $(DEBUG_MODE) $(SISTEMA)  -o $(EXECUTABLE_NAME) && echo "$(OK_COLOR)[OK]$(NO_COLOR)") \
+			||  (echo "$(ERROR_COLOR)[ERROR]$(NO_COLOR)" && exit 1; ); \
+		echo "\n"; \
+	fi
+
+with-clean: clean all
+	$(eval LOCAL=true)
+
+debug-with-clean: clean debug
+	$(eval LOCAL=true)
+
 
 debug: set-debug
 	$(eval LOCAL=true)
+
 set-debug: DEBUG_MODE := -DDEBUG
 set-debug: all-debug
 	$(eval LOCAL=true)
@@ -175,7 +193,9 @@ $(OBJ)/%.o: $(SRC)/%.c
 	@echo "Generando archivos object de $@ ...."
 	($(CC) $(DEBUG_MODE) $(SISTEMA)  -lm -I$(SRC) -c $< -o $@ && echo "$(OK_COLOR)[OK]$(NO_COLOR)") \
 		||  (echo "$(ERROR_COLOR)[ERROR]$(NO_COLOR)" && exit 1; )
+	$(eval COMPILED=true)
 	$(eval LOCAL=true)
+	
 
 clean:
 	$(eval LOCAL=true)
